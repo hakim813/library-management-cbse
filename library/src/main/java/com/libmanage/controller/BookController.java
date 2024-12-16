@@ -3,23 +3,30 @@ package com.libmanage.controller;
 import com.libmanage.model.Book;
 import com.libmanage.service.BookService;
 import org.springframework.stereotype.Controller;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 
 import java.util.List;
 import java.util.Scanner;
 
 @Controller
-public class BookController {
+public class BookController implements CommandLineRunner {
     private final BookService bookService;
 
+    @Autowired
     public BookController(BookService bookService) {
         this.bookService = bookService;
+    }
+
+    @Override
+    public void run(String... args) {
         startApplication();
     }
 
     private void startApplication() {
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.println("Book Management System");
+            System.out.println("\nBook Management System");
             System.out.println("1. Add Book");
             System.out.println("2. Borrow Book");
             System.out.println("3. Search Books");
@@ -49,23 +56,34 @@ public class BookController {
                 case 3 -> {
                     System.out.print("Enter Book Title to search: ");
                     String title = scanner.nextLine();
-                    bookService.searchBooksByTitle(title)
-                            .forEach(System.out::println);
+                    List<Book> books = bookService.searchBooksByTitle(title);
+                    if (books.isEmpty()) {
+                        System.out.println("No books found with that title.");
+                    } else {
+                        books.forEach(System.out::println);
+                    }
                 }
                 case 4 -> {
-                    System.out.println("This is the list of books available.\n----------------------------------------------------");
-                     List<Book> allBooks = bookService.getAllBooks();
-                     for(Book book : allBooks){
-                         System.out.println("No : "+allBooks.indexOf(book));
-                         System.out.println("Book ID : "+book.getId());
-                         System.out.println("Title : "+book.getTitle());
-                         System.out.println("Author : "+book.getAuthor());
-                         System.out.println("----------------------------------------------------");
-                     }
-
+                    System.out.println("List of books available:");
+                    System.out.println("----------------------------------------------------");
+                    List<Book> allBooks = bookService.getAllBooks();
+                    if (allBooks.isEmpty()) {
+                        System.out.println("No books in the library.");
+                    } else {
+                        for (int i = 0; i < allBooks.size(); i++) {
+                            Book book = allBooks.get(i);
+                            System.out.println("No: " + i);
+                            System.out.println("Book ID: " + book.getId());
+                            System.out.println("Title: " + book.getTitle());
+                            System.out.println("Author: " + book.getAuthor());
+                            System.out.println("Status: " + (book.isBorrowed() ? "Borrowed" : "Available"));
+                            System.out.println("----------------------------------------------------");
+                        }
+                    }
                 }
                 case 5 -> {
                     System.out.println("Exiting the program.");
+                    scanner.close();
                     return;
                 }
                 default -> System.out.println("Invalid option. Try again.");
