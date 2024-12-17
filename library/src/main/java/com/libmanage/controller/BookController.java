@@ -1,13 +1,14 @@
 package com.libmanage.controller;
 
-import com.libmanage.model.Book;
-import com.libmanage.service.BookService;
-import org.springframework.stereotype.Controller;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-
 import java.util.List;
 import java.util.Scanner;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Controller;
+
+import com.libmanage.model.Book;
+import com.libmanage.service.BookService;
 
 @Controller
 public class BookController implements CommandLineRunner {
@@ -60,7 +61,13 @@ public class BookController implements CommandLineRunner {
                     if (books.isEmpty()) {
                         System.out.println("No books found with that title.");
                     } else {
-                        books.forEach(System.out::println);
+                        for(Book book : books){
+                            System.out.println("ID: "+book.getId());
+                            System.out.println("Title: "+book.getTitle());
+                            System.out.println("Author: "+book.getAuthor());
+                            System.out.println("Borrowed status: "+ (book.isBorrowed() ? "Borrowed" : "Available"));
+                            System.out.println();
+                        }
                     }
                 }
                 case 4 -> {
